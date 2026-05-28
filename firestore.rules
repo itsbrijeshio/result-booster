@@ -1,0 +1,100 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 1. Global Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Reuseable primitives
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && (request.auth.token.email_verified == true || request.auth.token.email == "bk6500416@gmail.com");
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isOwner(ownerId) {
+      return isSignedIn() && request.auth.uid == ownerId;
+    }
+
+    // Role check
+    function isAdmin() {
+      return isSignedIn() && (request.auth.token.email == "bk6500416@gmail.com" || exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+    }
+
+    // Schema validation helpers
+    function isValidStudent(data) {
+      return data.keys().hasAll(['id', 'name', 'email', 'batchId', 'batchName', 'status'])
+        && data.keys().size() <= 11
+        && data.id is string && data.id.size() <= 128
+        && data.name is string && data.name.size() <= 100
+        && data.email is string && data.email.size() <= 100
+        && data.batchId is string && data.batchId.size() <= 128
+        && data.batchName is string && data.batchName.size() <= 100
+        && (data.status == 'active' || data.status == 'inactive');
+    }
+
+    function isValidTestAttempt(data) {
+      return data.keys().hasAll(['id', 'testId', 'testTitle', 'studentId', 'score', 'maxScore', 'submittedAt'])
+        && data.keys().size() <= 15
+        && data.id is string && data.id.size() <= 128
+        && data.testId is string && data.testId.size() <= 128
+        && data.testTitle is string && data.testTitle.size() <= 150
+        && data.studentId == request.auth.uid
+        && data.score is number && data.score >= 0 && data.score <= 100
+        && data.maxScore is number && data.maxScore > 0;
+    }
+
+    function isValidWeakArea(data) {
+      return data.keys().hasAll(['subject', 'topic', 'accuracy'])
+        && data.keys().size() <= 8
+        && data.subject is string && data.subject.size() <= 100
+        && data.topic is string && data.topic.size() <= 150
+        && data.accuracy is number && data.accuracy >= 0 && data.accuracy <= 100;
+    }
+
+    // Sub-routes matches
+    match /batches/{batchId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /students/{studentId} {
+      allow get: if isSignedIn() && (isOwner(studentId) || isAdmin());
+      allow list: if isSignedIn() && (resource.data.id == request.auth.uid || isAdmin());
+      allow create, update: if isVerifiedUser() && isOwner(studentId) && isValidStudent(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /questions/{questionId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /tests/{testId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /testAttempts/{attemptId} {
+      allow get: if isSignedIn() && (resource.data.studentId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.studentId == request.auth.uid || isAdmin());
+      allow create: if isVerifiedUser() && isValidTestAttempt(request.resource.data);
+      allow update, delete: if isAdmin();
+    }
+
+    match /weakAreas/{weakAreaId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      allow create, update: if isVerifiedUser() && isValidWeakArea(request.resource.data);
+      allow delete: if isAdmin();
+    }
+  }
+}

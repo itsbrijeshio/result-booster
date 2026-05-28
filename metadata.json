@@ -1,0 +1,6 @@
+{
+  "name": "Result Booster",
+  "description": "Premium SaaS Analytics, Campaign Management, and Conversion Rate Optimization Dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

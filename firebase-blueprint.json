@@ -1,0 +1,126 @@
+{
+  "entities": {
+    "Batch": {
+      "title": "Batch",
+      "description": "A classroom batch/cohort of students.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "studentCount": { "type": "integer" },
+        "schedule": { "type": "string" },
+        "avgPerformance": { "type": "number" },
+        "activeTestsCount": { "type": "integer" }
+      },
+      "required": ["id", "name", "studentCount", "schedule"]
+    },
+    "Student": {
+      "title": "Student",
+      "description": "Student information profile data.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "batchId": { "type": "string" },
+        "batchName": { "type": "string" },
+        "testsAttempted": { "type": "integer" },
+        "averageScore": { "type": "number" },
+        "joinedDate": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "inactive"] },
+        "weakSubjects": { "type": "array" }
+      },
+      "required": ["id", "name", "email", "batchId", "batchName", "status"]
+    },
+    "Question": {
+      "title": "Question",
+      "description": "A multiple-choice question in the syllabus quiz bank.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "text": { "type": "string" },
+        "options": { "type": "array" },
+        "correctOptionIdx": { "type": "integer" },
+        "tags": { "type": "array" },
+        "difficulty": { "type": "string", "enum": ["easy", "medium", "hard"] }
+      },
+      "required": ["id", "text", "options", "correctOptionIdx"]
+    },
+    "Test": {
+      "title": "Test",
+      "description": "A mock/remedial test created by the owner for a batch.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "durationMinutes": { "type": "integer" },
+        "batchId": { "type": "string" },
+        "batchName": { "type": "string" },
+        "questionCount": { "type": "integer" },
+        "totalMarks": { "type": "integer" },
+        "status": { "type": "string", "enum": ["active", "draft", "archived"] },
+        "description": { "type": "string" }
+      },
+      "required": ["id", "title", "durationMinutes", "batchId", "status"]
+    },
+    "TestAttempt": {
+      "title": "TestAttempt",
+      "description": "A record of a student's attempt at a mock test.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "testId": { "type": "string" },
+        "testTitle": { "type": "string" },
+        "studentId": { "type": "string" },
+        "score": { "type": "number" },
+        "maxScore": { "type": "number" },
+        "correctCount": { "type": "integer" },
+        "wrongCount": { "type": "integer" },
+        "skippedCount": { "type": "integer" },
+        "submittedAt": { "type": "string" },
+        "durationSeconds": { "type": "integer" },
+        "answers": { "type": "object" }
+      },
+      "required": ["id", "testId", "testTitle", "studentId", "score", "maxScore", "submittedAt"]
+    },
+    "WeakAreaDetail": {
+      "title": "WeakAreaDetail",
+      "description": "Performance metrics in weak subject areas.",
+      "type": "object",
+      "properties": {
+        "subject": { "type": "string" },
+        "topic": { "type": "string" },
+        "accuracy": { "type": "number" },
+        "questionsAttempted": { "type": "integer" },
+        "recommendedResource": { "type": "string" }
+      },
+      "required": ["subject", "topic", "accuracy"]
+    }
+  },
+  "firestore": {
+    "/batches/{batchId}": {
+      "schema": "Batch",
+      "description": "Classes and cohorts taught in the system."
+    },
+    "/students/{studentId}": {
+      "schema": "Student",
+      "description": "Student roster profiles."
+    },
+    "/questions/{questionId}": {
+      "schema": "Question",
+      "description": "Shared query block of multiple choice questions."
+    },
+    "/tests/{testId}": {
+      "schema": "Test",
+      "description": "Subject exams."
+    },
+    "/testAttempts/{attemptId}": {
+      "schema": "TestAttempt",
+      "description": "Submitted responses and score recordings."
+    },
+    "/weakAreas/{weakAreaId}": {
+      "schema": "WeakAreaDetail",
+      "description": "Student deficiency trackers."
+    }
+  }
+}
