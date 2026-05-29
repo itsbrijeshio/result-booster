@@ -26,6 +26,7 @@ import {
 
 // Page Imports
 import Login from './pages/Login';
+import LandingPage from './pages/LandingPage';
 import OwnerDashboard from './pages/owner/OwnerDashboard';
 import OwnerStudents from './pages/owner/OwnerStudents';
 import OwnerBatches from './pages/owner/OwnerBatches';
@@ -54,7 +55,7 @@ const queryClient = new QueryClient({
 
 export default function App() {
   const [role, setRole] = React.useState<'owner' | 'student' | null>(null);
-  const [currentPath, setCurrentPath] = React.useState<string>('/login');
+  const [currentPath, setCurrentPath] = React.useState<string>('/landing');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [navTransition, setNavTransition] = React.useState(false);
 
@@ -69,11 +70,11 @@ export default function App() {
           setRole('owner');
         } else if (hash.startsWith('/student')) {
           setRole('student');
-        } else if (hash === '/login') {
+        } else if (hash === '/login' || hash === '/landing') {
           setRole(null);
         }
       } else {
-        window.location.hash = '/login';
+        window.location.hash = '/landing';
       }
     };
 
@@ -150,9 +151,13 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <div className={`min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-muted antialiased ${isExamAttemptRoute ? 'w-full' : 'md:flex-row'}`}>
         
-        {/* Render login page if unauthenticated */}
-        {!role || currentPath === '/login' ? (
-          <Login onLogin={handleLogin} />
+        {/* Render login or landing page if unauthenticated */}
+        {!role || currentPath === '/login' || currentPath === '/landing' ? (
+          currentPath === '/landing' ? (
+            <LandingPage onNavigate={navigateTo} />
+          ) : (
+            <Login onLogin={handleLogin} />
+          )
         ) : isExamAttemptRoute ? (
           <main className="flex-1 flex flex-col min-w-0 bg-background h-screen overflow-y-auto w-full">
             <div className="flex-1 p-0 w-full mx-auto relative h-full">
