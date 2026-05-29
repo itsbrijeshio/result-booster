@@ -1,33 +1,17 @@
 import * as React from 'react';
 import { 
   AlertTriangle, 
-  Sparkles, 
-  Send, 
-  FlameKindling, 
-  Compass, 
-  CheckCircle, 
   Search, 
-  Filter, 
-  BookOpen, 
-  Clock, 
-  Layers, 
-  Users, 
   Phone, 
-  FileSpreadsheet, 
-  Plus, 
+  BookOpen, 
   MessageSquare, 
   Check, 
-  Info, 
-  RefreshCw, 
   Eye, 
-  ArrowUpRight, 
-  ArrowDownRight, 
-  MessageCircle,
-  TrendingUp,
-  HelpCircle,
-  PlusCircle,
-  Sliders,
-  Sparkle
+  Sparkles,
+  ChevronRight,
+  Filter,
+  CheckCircle,
+  FileText
 } from 'lucide-react';
 import { 
   Card, 
@@ -36,1076 +20,517 @@ import {
   CardDescription, 
   CardContent, 
   Badge, 
-  TableWrapper,
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-  EmptyState,
-  Button,
-  Modal,
-  Input,
-  Select,
-  Separator
+  Table, 
+  TableHeader, 
+  TableRow, 
+  TableHead, 
+  TableBody, 
+  TableCell, 
+  Modal
 } from '../../components/ui/CustomComponents';
-import { initialBatches } from '../../data';
 
-// Define rich At-Risk student records
-interface AtRiskStudent {
+// Clean WeakStudent Interface
+interface WeakStudent {
   id: string;
   name: string;
-  email: string;
-  mobile: string;
-  batchId: string;
-  batchName: string;
-  averageScore: number;
-  skippedTestsCount: number;
-  trend: 'up' | 'down' | 'flat';
-  trendPercentage: number;
+  batch: string;
+  weakIn: string;
+  lastScore: number;
+  avgScore: number;
+  attemptedTests: number;
+  missedTests: number;
+  phone: string;
+  notes: string;
   weakTopics: string[];
-  teacherNotes: string;
-  joinedDate: string;
 }
 
-const initialAtRiskStudents: AtRiskStudent[] = [
+const initialWeakStudents: WeakStudent[] = [
   {
-    id: 'st-at-1',
+    id: 'st-1',
+    name: 'Rahul',
+    batch: 'CCC Morning',
+    weakIn: 'Excel formulas',
+    lastScore: 34,
+    avgScore: 38,
+    attemptedTests: 8,
+    missedTests: 2,
+    phone: '+91 98123 45601',
+    notes: 'Struggles with basic formulas, specifically absolute references (F4) and nested IF syntax.',
+    weakTopics: ['Excel formulas', 'Shortcut keys', 'Windows OS File Directory']
+  },
+  {
+    id: 'st-2',
+    name: 'Aman',
+    batch: 'DCA Batch',
+    weakIn: 'Internet concepts',
+    lastScore: 42,
+    avgScore: 45,
+    attemptedTests: 6,
+    missedTests: 3,
+    phone: '+91 98123 45602',
+    notes: 'Often absent during critical cybersecurity protocol lectures. Concepts around HTTP vs HTTPS are weak.',
+    weakTopics: ['Internet concepts', 'Email setup', 'Virus/Malware protection']
+  },
+  {
+    id: 'st-3',
+    name: 'Priya',
+    batch: 'CCC Evening',
+    weakIn: 'Excel formulas',
+    lastScore: 39,
+    avgScore: 41,
+    attemptedTests: 9,
+    missedTests: 1,
+    phone: '+91 98123 45603',
+    notes: 'Basic formulas arithmetic is fine, but struggles when selecting correct lookup structures matching targets.',
+    weakTopics: ['Excel formulas', 'Word formatting', 'LibreOffice Calc']
+  },
+  {
+    id: 'st-4',
     name: 'Ananya Goel',
-    email: 'ananya.goel@resultbooster.com',
-    mobile: '+91 98123 45602',
-    batchId: 'batch-1',
-    batchName: 'CCC Morning Batch A',
-    averageScore: 54.2,
-    skippedTestsCount: 2,
-    trend: 'down',
-    trendPercentage: 4.5,
-    weakTopics: ['MS Excel Advanced Formulas', 'Windows Operating System OS', 'Keyboard Shortcuts'],
-    teacherNotes: 'Understands basic formulas but struggles with complex conditions & nested IF parameters. Skipped the Excel formulas assignment last Friday.',
-    joinedDate: '2026-03-15'
+    batch: 'CCC Morning',
+    weakIn: 'Excel formulas',
+    lastScore: 54,
+    avgScore: 56,
+    attemptedTests: 10,
+    missedTests: 2,
+    phone: '+91 98123 45604',
+    notes: 'Slow but displays progress on standard formulas. Requires continuous minor feedback sets.',
+    weakTopics: ['Excel formulas', 'Operating Systems', 'Word Document Alignment']
   },
   {
-    id: 'st-at-2',
+    id: 'st-5',
     name: 'Ishita Patel',
-    email: 'ishita.patel@resultbooster.com',
-    mobile: '+91 98123 45604',
-    batchId: 'batch-2',
-    batchName: 'DCA Regular Batch B',
-    averageScore: 48.6,
-    skippedTestsCount: 3,
-    trend: 'down',
-    trendPercentage: 6.2,
-    weakTopics: ['MS Word formatting tools', 'File Extensions & Storage', 'Internet Web Security'],
-    teacherNotes: 'Critical gap in file hierarchy & system storage logic. Advanced paragraph styling margins consistently below benchmark. Needs focus on practical drills.',
-    joinedDate: '2026-04-03'
+    batch: 'DCA Batch',
+    weakIn: 'Word formatting',
+    lastScore: 48,
+    avgScore: 50,
+    attemptedTests: 7,
+    missedTests: 3,
+    phone: '+91 98123 45605',
+    notes: 'Tab stops, alignment indentations, and table margins require manual step-by-step revision drills.',
+    weakTopics: ['Word formatting', 'Keyboard Shortcuts', 'File Management']
   },
   {
-    id: 'st-at-3',
-    name: 'Rohan Vasu',
-    email: 'rohan.vasu@resultbooster.com',
-    mobile: '+91 90512 78391',
-    batchId: 'batch-1',
-    batchName: 'CCC Morning Batch A',
-    averageScore: 58.1,
-    skippedTestsCount: 1,
-    trend: 'up',
-    trendPercentage: 2.3,
-    weakTopics: ['LibreOffice Writer Operations', 'Operating System basics'],
-    teacherNotes: 'Showing a trace of recovery after assigning the LibreOffice keyboard shortcut booster pack. Custom alignments and styles remains a blocker.',
-    joinedDate: '2026-04-10'
-  },
-  {
-    id: 'st-at-4',
-    name: 'Meera Nair',
-    email: 'meera.nair@resultbooster.com',
-    mobile: '+91 91234 50987',
-    batchId: 'batch-2',
-    batchName: 'DCA Regular Batch B',
-    averageScore: 51.5,
-    skippedTestsCount: 4,
-    trend: 'down',
-    trendPercentage: 1.8,
-    weakTopics: ['Network subnetting basics', 'Computer Fundamentals', 'Email Configurations'],
-    teacherNotes: 'Skipped four laboratory sessions and has lowest performance indicators in Ms Access tables. Requires structured assignments enforcement.',
-    joinedDate: '2026-04-18'
-  },
-  {
-    id: 'st-at-5',
+    id: 'st-6',
     name: 'Ranbir Kapoor',
-    email: 'ranbir.k@gmail.com',
-    mobile: '+91 98123 45612',
-    batchId: 'batch-3',
-    batchName: 'ADCA Evening Advanced',
-    averageScore: 39.0,
-    skippedTestsCount: 5,
-    trend: 'down',
-    trendPercentage: 11.4,
-    weakTopics: ['Programming - Python Syntax', 'Database Keys & Field indexes', 'Web Design basics'],
-    teacherNotes: 'Candidate recently skipped fundamental lectures. Heavy conceptual backlog in basic programming logic parameters and database relations.',
-    joinedDate: '2026-05-01'
-  },
-  {
-    id: 'st-at-6',
-    name: 'Aditya Roy',
-    email: 'aditya.roy@resultbooster.com',
-    mobile: '+91 98123 45610',
-    batchId: 'batch-1',
-    batchName: 'CCC Morning Batch A',
-    averageScore: 62.1,
-    skippedTestsCount: 0,
-    trend: 'up',
-    trendPercentage: 5.8,
-    weakTopics: ['PowerPoint Animations', 'MS Word Tab Stops'],
-    teacherNotes: 'Scored above 60% in latest office tools tests but slips in advanced custom templates and macro scripting. Progressing toward stability.',
-    joinedDate: '2026-04-12'
+    batch: 'ADCA Evening',
+    weakIn: 'Python Syntax',
+    lastScore: 39,
+    avgScore: 35,
+    attemptedTests: 4,
+    missedTests: 5,
+    phone: '+91 98123 45612',
+    notes: 'Absenteeism is high. Blocked at fundamental loops variables and array indices. Urgent intervention needed.',
+    weakTopics: ['Python Syntax', 'Database Relations', 'HTML/CSS Basics']
   }
 ];
 
-// Heatmap dynamic data
-interface HeatmapTopic {
-  name: string;
-  category: 'Office Suite' | 'Fundamentals' | 'Programming' | 'Internet';
-  strugglingCount: number;
-  impactLevel: 'High' | 'Critical' | 'Medium';
-}
-
-const initialHeatmapTopics: HeatmapTopic[] = [
-  { name: 'MS Excel Advanced Formulas', category: 'Office Suite', strugglingCount: 8, impactLevel: 'Critical' },
-  { name: 'Windows Operating System OS', category: 'Fundamentals', strugglingCount: 12, impactLevel: 'Critical' },
-  { name: 'Programming - Python Syntax', category: 'Programming', strugglingCount: 15, impactLevel: 'Critical' },
-  { name: 'MS Word formatting tools', category: 'Office Suite', strugglingCount: 9, impactLevel: 'High' },
-  { name: 'Network subnetting basics', category: 'Internet', strugglingCount: 6, impactLevel: 'Medium' },
-  { name: 'LibreOffice Writer Operations', category: 'Office Suite', strugglingCount: 5, impactLevel: 'Medium' },
-  { name: 'Database Keys & Field indexes', category: 'Programming', strugglingCount: 11, impactLevel: 'High' },
-  { name: 'Email Configurations', category: 'Internet', strugglingCount: 7, impactLevel: 'Medium' }
-];
-
 export default function OwnerWeakStudents() {
-  // --- CORE INTERVENTIONS CONTROLS ---
-  const [students, setStudents] = React.useState<AtRiskStudent[]>(initialAtRiskStudents);
-  const [thresholdFilter, setThresholdFilter] = React.useState<number>(65); // Slider/selector for under threshold score limit
-  const [selectedBatchId, setSelectedBatchId] = React.useState<string>('all');
+  const [students, setStudents] = React.useState<WeakStudent[]>(initialWeakStudents);
   const [searchQuery, setSearchQuery] = React.useState<string>('');
+  const [selectedBatch, setSelectedBatch] = React.useState<string>('all');
   
-  // Highlight chosen topic in heatmap to filter table dynamically!
-  const [selectedHeatmapTopic, setSelectedHeatmapTopic] = React.useState<string | null>(null);
-
-  // --- INTERACTIVE MODALS STRATEGY ---
-  const [activeModalStudent, setActiveModalStudent] = React.useState<AtRiskStudent | null>(null);
-  const [modalType, setModalType] = React.useState<'practice' | 'whatsapp' | 'view' | 'edit-note' | null>(null);
+  // Selected Student for Detail Modal / Drawer
+  const [selectedStudent, setSelectedStudent] = React.useState<WeakStudent | null>(null);
   
-  // Custom states for modal payloads
-  const [customTestTopic, setCustomTestTopic] = React.useState<string>('');
-  const [customTestDuration, setCustomTestDuration] = React.useState<string>('30');
-  const [customTestQuestions, setCustomTestQuestions] = React.useState<string>('15');
-  const [interactiveTeacherNote, setInteractiveTeacherNote] = React.useState<string>('');
-  const [isNoteModified, setIsNoteModified] = React.useState<boolean>(false);
+  // Action Feedback States
+  const [whatsappSent, setWhatsappSent] = React.useState<Record<string, boolean>>({});
+  const [assignedTests, setAssignedTests] = React.useState<Record<string, string>>({});
+  const [toast, setToast] = React.useState<string | null>(null);
 
-  // General Notification System UI
-  const [notification, setNotification] = React.useState<string | null>(null);
+  // Note edit state
+  const [activeNoteText, setActiveNoteText] = React.useState<string>('');
+  
+  // Test Selection state for assignment
+  const [testToAssign, setTestToAssign] = React.useState<string>('Excel basic formulas drill (15 min)');
 
-  const triggerNotification = (text: string) => {
-    setNotification(text);
-    setTimeout(() => setNotification(null), 4000);
+  const triggerToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 4000);
   };
 
-  // Filter students based on current selection parameters
-  const filteredStudents = students.filter(st => {
-    // 1. Check Search Query
-    const matchesSearch = st.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          st.weakTopics.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
-    
-    // 2. Filter by threshold score limit
-    const matchesThreshold = st.averageScore <= thresholdFilter;
-
-    // 3. Filter by batch
-    const matchesBatch = selectedBatchId === 'all' || st.batchId === selectedBatchId;
-
-    // 4. Heatmap highlighted filter (Double visual synergy)
-    const matchesHeatmap = !selectedHeatmapTopic || st.weakTopics.includes(selectedHeatmapTopic);
-
-    return matchesSearch && matchesThreshold && matchesBatch && matchesHeatmap;
-  });
-
-  // --- CORE SYSTEM OPERATIONS ---
-  const handleOpenAssignModal = (student: AtRiskStudent) => {
-    setActiveModalStudent(student);
-    setCustomTestTopic(student.weakTopics[0] || 'MS Excel Advanced Formulas');
-    setCustomTestDuration('35');
-    setCustomTestQuestions('15');
-    setModalType('practice');
+  // Open candidate details modal
+  const handleOpenDetail = (student: WeakStudent) => {
+    setSelectedStudent(student);
+    setActiveNoteText(student.notes);
   };
 
-  const submitAssignPracticeTest = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!activeModalStudent) return;
-
-    triggerNotification(
-      `🎯 Personalized Adaptive Practice set dispatched to ${activeModalStudent.name}! Target sub-unit: ${customTestTopic} (${customTestQuestions} Questions, ${customTestDuration} mins)`
-    );
-    setModalType(null);
-    setActiveModalStudent(null);
-  };
-
-  const handleOpenWhatsAppModal = (student: AtRiskStudent) => {
-    setActiveModalStudent(student);
-    setModalType('whatsapp');
-  };
-
-  const submitWhatsAppReport = () => {
-    if (!activeModalStudent) return;
-    triggerNotification(
-      `💬 Remedial breakdown dispatched to parents of ${activeModalStudent.name} is scheduled on WhatsApp! SMS log saved in command center index.`
-    );
-    setModalType(null);
-    setActiveModalStudent(null);
-  };
-
-  const handleOpenEditNoteModal = (student: AtRiskStudent) => {
-    setActiveModalStudent(student);
-    setInteractiveTeacherNote(student.teacherNotes);
-    setModalType('edit-note');
-  };
-
-  const saveTeacherNoteChange = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!activeModalStudent) return;
-
+  // Save customized notes
+  const handleSaveNotes = () => {
+    if (!selectedStudent) return;
     setStudents(prev => prev.map(s => {
-      if (s.id === activeModalStudent.id) {
-        return { ...s, teacherNotes: interactiveTeacherNote };
+      if (s.id === selectedStudent.id) {
+        return { ...s, notes: activeNoteText };
       }
       return s;
     }));
-
-    triggerNotification(`📝 Updated coordinator notes for student ${activeModalStudent.name}`);
-    setModalType(null);
-    setActiveModalStudent(null);
+    setSelectedStudent(prev => prev ? { ...prev, notes: activeNoteText } : null);
+    triggerToast(`Notes updated successfully for ${selectedStudent.name}!`);
   };
 
-  const triggerResetFilters = () => {
-    setSearchQuery('');
-    setThresholdFilter(65);
-    setSelectedBatchId('all');
-    setSelectedHeatmapTopic(null);
-    triggerNotification('Successfully restored default active dashboard filter parameters.');
+  // Dispatch mock remedial
+  const handleAssignTest = () => {
+    if (!selectedStudent) return;
+    setAssignedTests(prev => ({ ...prev, [selectedStudent.id]: testToAssign }));
+    triggerToast(`Remedial test "${testToAssign}" assigned successfully to ${selectedStudent.name}!`);
+    setSelectedStudent(null);
   };
 
-  // Calculate stats for layout reference
-  const totalStruggling = students.length;
-  const criticalThreatCount = students.filter(s => s.averageScore < 50).length;
-  const skippedWorksetsSum = students.reduce((acc, current) => acc + current.skippedTestsCount, 0);
+  // Parental WhatsApp broadcast trigger code simulation
+  const handleSendWhatsApp = () => {
+    if (!selectedStudent) return;
+    setWhatsappSent(prev => ({ ...prev, [selectedStudent.id]: true }));
+    triggerToast(`Parent alert successfully scheduled & sent on WhatsApp to ${selectedStudent.phone}!`);
+    setSelectedStudent(null);
+  };
+
+  // Filters candidates list inline
+  const filteredStudents = students.filter(student => {
+    const matchesSearch = student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          student.weakIn.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesBatch = selectedBatch === 'all' || student.batch === selectedBatch;
+    return matchesSearch && matchesBatch;
+  });
+
+  // Dynamic unique list of batches for the filtering system
+  const uniqueBatches = Array.from(new Set(students.map(s => s.batch)));
 
   return (
-    <div className="space-y-6 lg:space-y-8 animate-fade-in pb-12 font-sans">
+    <div className="space-y-6 animate-fade-in pb-12 font-sans w-full max-w-7xl mx-auto px-4 md:px-0">
       
-      {/* Central Notification Toast */}
-      {notification && (
-        <div className="fixed top-20 right-4 z-50 p-4 max-w-sm rounded-xl border border-primary/20 bg-card text-foreground shadow-lg flex items-start gap-3 animate-slide-in">
+      {/* Visual Toast Notification Banner */}
+      {toast && (
+        <div className="fixed top-6 right-6 z-50 p-4 max-w-sm rounded-xl border border-primary/20 bg-card text-foreground shadow-lg flex items-start gap-3 animate-slide-in">
           <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 text-primary mt-0.5">
             <Sparkles className="h-3 w-3" />
           </div>
-          <div className="space-y-1">
-            <span className="text-xs font-black block">Result Booster Intervention Broadcast</span>
-            <p className="text-[11px] text-muted-foreground leading-normal">{notification}</p>
+          <div className="space-y-0.5">
+            <span className="text-xs font-bold block">Booster Action Completed</span>
+            <p className="text-[11px] text-muted-foreground leading-normal">{toast}</p>
           </div>
         </div>
       )}
 
-      {/* TOP SECTION: Hero Page Title, Interactive Action, Explanation Texts */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-border/60 pb-5">
-        <div>
-          <h1 className="text-3xl font-black tracking-tight text-foreground flex items-center gap-2">
-            <AlertTriangle className="h-8 w-8 text-destructive animate-pulse" />
-            Weak Student Detection
-          </h1>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1.5 max-w-2xl leading-relaxed">
-            Result Booster's flagship workspace engine. Monitor candidates whose continuous diagnostic score models hover below limits. Deploy adaptive task homework modules and synchronize warning cards directly with registered parents.
-          </p>
+      {/* Humble Title Header */}
+      <div className="border-b border-border/60 pb-5 pt-2">
+        <h1 className="text-2xl font-black tracking-tight text-foreground flex items-center gap-2">
+          <AlertTriangle className="h-6 w-6 text-destructive shrink-0" />
+          <span>At-Risk Students Spotlight</span>
+        </h1>
+        <p className="text-xs text-muted-foreground mt-1 text-slate-500 italic">
+          Fast-action diagnostics and student performance overview • Click any row or action to update notes, dispatch parent messages, or assign specific practice.
+        </p>
+      </div>
+
+      {/* Filters Toolbar */}
+      <div className="flex flex-col sm:flex-row gap-3 items-center justify-between bg-muted/20 p-3.5 rounded-xl border border-border/60">
+        <div className="relative w-full sm:max-w-xs">
+          <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground/60" />
+          <input
+            type="text"
+            placeholder="Search student or topic..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-8.5 pr-3 py-1.5 text-xs bg-background border border-border rounded-lg outline-hidden focus:border-primary/50"
+          />
         </div>
 
-        {/* Global Stats Indicators */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <div className="px-3.5 py-2 rounded-xl bg-destructive/5 border border-destructive/20 text-center">
-            <span className="text-[10px] text-muted-foreground uppercase font-black block">Threat Status</span>
-            <strong className="text-sm font-black text-destructive">{criticalThreatCount} Critical (&lt;50%)</strong>
-          </div>
-          <div className="px-3.5 py-2 rounded-xl bg-amber-500/5 border border-amber-500/20 text-center">
-            <span className="text-[10px] text-muted-foreground uppercase font-black block">Missed Papers</span>
-            <strong className="text-sm font-black text-amber-600 dark:text-amber-400">{skippedWorksetsSum} Total Skipped</strong>
-          </div>
+        <div className="flex items-center gap-2 w-full sm:w-auto shrink-0 justify-end">
+          <Filter className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+          <select
+            value={selectedBatch}
+            onChange={(e) => setSelectedBatch(e.target.value)}
+            className="text-xs bg-background border border-border rounded-lg px-2.5 py-1.5 focus:border-primary/50 outline-hidden"
+          >
+            <option value="all">Every classroom stream</option>
+            {uniqueBatches.map(batch => (
+              <option key={batch} value={batch}>{batch}</option>
+            ))}
+          </select>
         </div>
       </div>
 
-      {/* INTERACTIVE CONTROLS TOOLBAR */}
-      <Card className="p-4 bg-muted/20 border border-border/85 select-none">
-        <div className="grid gap-4 md:grid-cols-12 items-end">
-          
-          {/* 1. Risk Threshold slider Filter */}
-          <div className="md:col-span-4 space-y-1.5">
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-foreground">Scoring Threshold Cut: </span>
-              <Badge variant="destructive" className="font-mono font-bold text-[10px]">&le; {thresholdFilter}% Accuracy</Badge>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <span className="text-[10px] text-muted-foreground">40%</span>
-              <input 
-                type="range" 
-                min="40" 
-                max="80" 
-                step="5" 
-                value={thresholdFilter}
-                onChange={(e) => setThresholdFilter(Number(e.target.value))}
-                className="w-full h-1.5 bg-muted-foreground/20 rounded-lg appearance-none cursor-pointer accent-primary" 
-              />
-              <span className="text-[10px] text-muted-foreground">80%</span>
-            </div>
-          </div>
+      {/* TABLE FIRST VIEW */}
+      <Card className="border border-border/80 shadow-xs">
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/30">
+                  <TableHead className="py-3 font-extrabold text-xs text-foreground pl-4">Student</TableHead>
+                  <TableHead className="py-3 font-extrabold text-xs text-foreground">Batch</TableHead>
+                  <TableHead className="py-3 font-extrabold text-xs text-foreground">Weak In</TableHead>
+                  <TableHead className="py-3 font-extrabold text-xs text-foreground text-center">Last Score</TableHead>
+                  <TableHead className="py-3 font-extrabold text-xs text-foreground text-center">Missed Tests</TableHead>
+                  <TableHead className="py-3 font-extrabold text-xs text-foreground text-right pr-4">Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredStudents.length > 0 ? (
+                  filteredStudents.map((st) => (
+                    <TableRow 
+                      key={st.id} 
+                      className="hover:bg-muted/40 transition-colors cursor-pointer group"
+                      onClick={() => handleOpenDetail(st)}
+                    >
+                      {/* Name */}
+                      <TableCell className="align-middle py-3.5 pl-4">
+                        <div className="flex items-center gap-2.5">
+                          <div className={`h-7 w-7 rounded-lg font-bold text-xs flex items-center justify-center shrink-0 ${
+                            st.lastScore < 40 
+                              ? 'bg-rose-500/10 text-rose-600' 
+                              : 'bg-amber-500/10 text-amber-600'
+                          }`}>
+                            {st.name.charAt(0)}
+                          </div>
+                          <div>
+                            <span className="font-bold text-foreground text-xs block leading-none">{st.name}</span>
+                            <span className="text-[10px] text-muted-foreground mt-0.5 block">{st.phone}</span>
+                          </div>
+                        </div>
+                      </TableCell>
 
-          {/* 2. Batch Selector Filter */}
-          <div className="md:col-span-3 space-y-1.5">
-            <label className="text-[11px] font-bold text-muted-foreground uppercase">Classroom Batch</label>
-            <Select
-              value={selectedBatchId}
-              onChange={(e) => setSelectedBatchId(e.target.value)}
-              className="h-9 text-xs bg-background"
-            >
-              <option value="all">📁 All Classroom Streams</option>
-              {initialBatches.map(b => (
-                <option key={b.id} value={b.id}>{b.name}</option>
-              ))}
-            </Select>
-          </div>
+                      {/* Class Batch */}
+                      <TableCell className="align-middle py-3.5 text-xs font-semibold text-foreground">
+                        {st.batch}
+                      </TableCell>
 
-          {/* 3. Search Field input */}
-          <div className="md:col-span-3 space-y-1.5">
-            <label className="text-[11px] font-bold text-muted-foreground uppercase">Query Topic or Name</label>
-            <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground/60" />
-              <Input
-                placeholder="Search candidate or weak module..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8.5 h-9 text-xs bg-background placeholder:text-muted-foreground"
-              />
-            </div>
-          </div>
+                      {/* Weak In */}
+                      <TableCell className="align-middle py-3.5">
+                        <Badge variant="outline" className="text-[10px] font-mono py-0 px-2 bg-muted/40 font-bold border-border/80">
+                          {st.weakIn}
+                        </Badge>
+                      </TableCell>
 
-          {/* Reset Action Button */}
-          <div className="md:col-span-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={triggerResetFilters}
-              className="w-full h-9 gap-1.5 font-bold text-xs"
-            >
-              <RefreshCw className="h-3.5 w-3.5" />
-              Reset Filters
-            </Button>
-          </div>
+                      {/* Last Score */}
+                      <TableCell className="align-middle py-3.5 text-center font-bold text-xs font-mono">
+                        <span className={st.lastScore < 40 ? 'text-rose-500 font-extrabold' : 'text-amber-500 font-extrabold'}>
+                          {st.lastScore}%
+                        </span>
+                      </TableCell>
 
-        </div>
+                      {/* Missed Tests */}
+                      <TableCell className="align-middle py-3.5 text-center font-mono text-xs">
+                        {st.missedTests > 0 ? (
+                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                            st.missedTests >= 3 
+                              ? 'bg-rose-500/10 text-rose-600' 
+                              : 'bg-amber-500/10 text-amber-600'
+                          }`}>
+                            {st.missedTests}
+                          </span>
+                        ) : (
+                          <span className="text-emerald-500 text-[10px]">None</span>
+                        )}
+                      </TableCell>
 
-        {/* Informational strip if topic highlighted */}
-        {selectedHeatmapTopic && (
-          <div className="mt-3 pt-2.5 border-t border-border flex items-center justify-between text-xs bg-primary/5 p-2 rounded-lg">
-            <span className="text-muted-foreground">
-              Filtering specifically for candidates struggling in: <strong className="text-foreground font-semibold">{selectedHeatmapTopic}</strong>
-            </span>
-            <button
-              onClick={() => setSelectedHeatmapTopic(null)}
-              className="text-primary hover:underline font-bold text-[10px] uppercase"
-            >
-              Clear Heatmap Filter ×
-            </button>
+                      {/* Action trigger code buttons */}
+                      <TableCell className="align-middle py-3.5 text-right pr-4" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenDetail(st)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-secondary hover:bg-secondary/80 text-foreground text-[11px] font-bold rounded-lg transition-all cursor-pointer active:scale-95"
+                          >
+                            <Eye className="h-3 w-3 text-muted-foreground" />
+                            <span>View</span>
+                          </button>
+
+                          {assignedTests[st.id] ? (
+                            <Badge className="text-[9px] font-mono max-w-[100px] truncate" title={`Assigned: ${assignedTests[st.id]}`}>
+                              ✓ Sent
+                            </Badge>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                handleOpenDetail(st);
+                              }}
+                              className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-primary text-primary-foreground hover:bg-primary/95 text-[11px] font-bold rounded-lg transition-all cursor-pointer active:scale-95"
+                            >
+                              <BookOpen className="h-3 w-3" />
+                              <span>Assign Test</span>
+                            </button>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8">
+                      <div className="flex flex-col items-center justify-center space-y-2 text-muted-foreground select-none">
+                        <CheckCircle className="h-8 w-8 text-emerald-500" />
+                        <span className="text-xs font-bold font-sans">No matching student found.</span>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           </div>
-        )}
+        </CardContent>
       </Card>
 
-      {/* DOUBLE DOUBLE GRID CORE VIEW LAYOUT */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        
-        {/* LEFT COLUMN: Premium Candidate Table */}
-        <div className="lg:col-span-2 space-y-4">
-          <TableWrapper
-            title="Comprehensive At-Risk Candidate Queue"
-            description={`Displaying ${filteredStudents.length} candidate rows struggling in critical performance indicators`}
-          >
-            {filteredStudents.length > 0 ? (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-xs">Student Candidate</TableHead>
-                    <TableHead className="text-xs">Class Batch</TableHead>
-                    <TableHead className="text-xs text-center font-bold">Accuracy Mean &amp; Trend</TableHead>
-                    <TableHead className="text-xs">Risk Matrix</TableHead>
-                    <TableHead className="text-xs">Key Weak Subjects</TableHead>
-                    <TableHead className="text-xs text-center">Skipped</TableHead>
-                    <TableHead className="text-xs text-right">Intervention Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredStudents.map((st) => {
-                    const isCritical = st.averageScore < 50;
-                    const isHigh = st.averageScore >= 50 && st.averageScore < 60;
-                    const isModerate = st.averageScore >= 60;
-
-                    return (
-                      <React.Fragment key={st.id}>
-                        {/* Student Primary Row */}
-                        <TableRow className="border-b-0 hover:bg-muted/10">
-                          
-                          {/* Student Details Component */}
-                          <TableCell className="align-top py-4">
-                            <div className="flex items-start gap-2.5">
-                              <div className={`h-8 w-8 rounded-full font-bold text-xs flex items-center justify-center shrink-0 border ${
-                                isCritical 
-                                  ? 'bg-destructive/10 text-destructive border-destructive/25' 
-                                  : 'bg-amber-500/10 text-amber-500 border-amber-500/25'
-                              }`}>
-                                {st.name.charAt(0)}
-                              </div>
-                              <div>
-                                <span className="font-extrabold text-foreground text-xs block leading-none">{st.name}</span>
-                                <span className="text-[9px] text-muted-foreground font-mono block mt-1">{st.email}</span>
-                              </div>
-                            </div>
-                          </TableCell>
-
-                          {/* Classroom Batch */}
-                          <TableCell className="align-top py-4 text-xs font-semibold text-foreground max-w-[120px] truncate" title={st.batchName}>
-                            {st.batchName}
-                          </TableCell>
-
-                          {/* Latest Acc Mean & Trend Visualizer */}
-                          <TableCell className="align-top py-4 text-center font-mono">
-                            <div className="space-y-1">
-                              <span className={`text-xs font-black block ${
-                                isCritical ? 'text-destructive font-black' : 'text-foreground'
-                              }`}>
-                                {st.averageScore}%
-                              </span>
-                              
-                              <span className={`inline-flex items-center gap-0.5 text-[9px] font-bold ${
-                                st.trend === 'up' 
-                                  ? 'text-emerald-600 dark:text-emerald-400' 
-                                  : st.trend === 'down' 
-                                    ? 'text-destructive' 
-                                    : 'text-muted-foreground'
-                              }`}>
-                                {st.trend === 'up' && <ArrowUpRight className="h-2.5 w-2.5" />}
-                                {st.trend === 'down' && <ArrowDownRight className="h-2.5 w-2.5" />}
-                                <span>{st.trendPercentage}%</span>
-                              </span>
-                            </div>
-                          </TableCell>
-
-                          {/* Risk Badging derived */}
-                          <TableCell className="align-top py-4">
-                            {isCritical && (
-                              <Badge variant="destructive" className="text-[8px] tracking-wide uppercase font-black px-1.5 py-0 leading-none">
-                                Critical Alert
-                              </Badge>
-                            )}
-                            {isHigh && (
-                              <Badge className="text-[8px] tracking-wide uppercase font-black px-1.5 py-0 leading-none border-transparent text-amber-600 bg-amber-50 dark:bg-amber-500/10 dark:text-amber-400">
-                                High Risk
-                              </Badge>
-                            )}
-                            {isModerate && (
-                              <Badge variant="secondary" className="text-[8px] tracking-wide uppercase font-black px-1.5 py-0 leading-none border-transparent text-blue-600 bg-blue-50 dark:bg-blue-500/10 dark:text-blue-400">
-                                Moderate Risk
-                              </Badge>
-                            )}
-                          </TableCell>
-
-                          {/* Specific weak subjects */}
-                          <TableCell className="align-top py-4 max-w-[180px]">
-                            <div className="flex flex-wrap gap-1">
-                              {st.weakTopics.map((topic, i) => (
-                                <Badge 
-                                  key={i} 
-                                  variant="outline" 
-                                  onClick={() => setSelectedHeatmapTopic(selectedHeatmapTopic === topic ? null : topic)}
-                                  className={`text-[9px] font-mono px-1 py-0 cursor-pointer hover:bg-primary/5 transition-colors ${
-                                    selectedHeatmapTopic === topic 
-                                      ? 'bg-primary/10 text-primary border-primary/45' 
-                                      : 'bg-muted/40 text-muted-foreground'
-                                  }`}
-                                  title="Click to screen students with this conceptual blocker"
-                                >
-                                  {topic}
-                                </Badge>
-                              ))}
-                            </div>
-                          </TableCell>
-
-                          {/* Missed exam count */}
-                          <TableCell className="align-top py-4 text-center font-mono font-bold text-xs">
-                            {st.skippedTestsCount > 0 ? (
-                              <span className={`px-2 py-0.5 text-[10px] rounded-md ${
-                                st.skippedTestsCount >= 3 
-                                  ? 'bg-destructive/10 text-destructive' 
-                                  : 'bg-amber-500/10 text-amber-500'
-                              }`}>
-                                {st.skippedTestsCount}
-                              </span>
-                            ) : (
-                              <span className="text-emerald-500 text-[10px]">None</span>
-                            )}
-                          </TableCell>
-
-                          {/* Inline Interventions Actions */}
-                          <TableCell className="align-top py-4 text-right pr-4">
-                            <div className="flex items-center justify-end gap-1.5 flex-wrap">
-                              {/* View details */}
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setActiveModalStudent(st);
-                                  setModalType('view');
-                                }}
-                                className="p-1 border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-accent rounded transition-all"
-                                title="View Dossier Details"
-                              >
-                                <Eye className="h-3.5 w-3.5" />
-                              </button>
-
-                              {/* WhatsApp Direct */}
-                              <button
-                                type="button"
-                                onClick={() => handleOpenWhatsAppModal(st)}
-                                className="p-1 border border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 rounded transition-all"
-                                title="Send WhatsApp parent report card"
-                              >
-                                <MessageCircle className="h-3.5 w-3.5" />
-                              </button>
-
-                              {/* Assign remedial homework drill */}
-                              <button
-                                type="button"
-                                onClick={() => handleOpenAssignModal(st)}
-                                className="inline-flex items-center gap-1 text-[10px] font-extrabold bg-primary text-primary-foreground hover:bg-primary/95 px-2 py-1 rounded transition-all active:scale-95 cursor-pointer shadow-xs"
-                              >
-                                <PlusCircle className="h-3 w-3 shrink-0" />
-                                Remedial Test
-                              </button>
-                            </div>
-                          </TableCell>
-
-                        </TableRow>
-
-                        {/* Coordinated Extra Child Row containing teacher notes preview & edit */}
-                        <TableRow className="bg-muted/[0.01] hover:bg-transparent">
-                          <TableCell colSpan={7} className="pt-0 pb-4 pl-12 pr-4 border-b border-border">
-                            <div className="rounded-xl border border-dashed border-border/85 bg-card/65 p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-                              
-                              {/* Note text summary */}
-                              <div className="space-y-1">
-                                <span className="text-[10px] text-muted-foreground uppercase font-black block flex items-center gap-1">
-                                  <MessageSquare className="h-3 w-3 text-primary shrink-0" />
-                                  Academic Action Checklist Remark
-                                </span>
-                                <p className="text-muted-foreground leading-normal italic text-[11px]">
-                                  &ldquo;{st.teacherNotes}&rdquo;
-                                </p>
-                              </div>
-
-                              {/* Fast inline remark edit popover clicker */}
-                              <button
-                                type="button"
-                                onClick={() => handleOpenEditNoteModal(st)}
-                                className="text-primary hover:underline font-bold text-[10px] flex items-center gap-1 shrink-0 uppercase tracking-widest self-end sm:self-center"
-                              >
-                                Update Note
-                              </button>
-
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      </React.Fragment>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            ) : (
-              <EmptyState
-                icon={CheckCircle}
-                title="No students match the customized filter bounds"
-                description="This indicates that currently, all system learners are either exceeding the target risk threshold parameters, belong to other class branches, or have cleared the spotlight topics."
-                actionLabel="Reset Applied Filters"
-                onAction={triggerResetFilters}
-              />
-            )}
-          </TableWrapper>
-        </div>
-
-        {/* RIGHT COLUMN SIDE PANEL: Deep Analytics Bento Cards */}
-        <div className="space-y-6">
-          
-          {/* ANALYTICS CARD 1: Topic Heatmap tracker */}
-          <Card className="border border-border shadow-xs">
-            <CardHeader className="p-5 pb-3">
-              <div className="flex justify-between items-center">
-                <CardTitle className="text-sm font-black text-foreground flex items-center gap-1.5">
-                  <FlameKindling className="h-4 w-4 text-destructive shrink-0" />
-                  Blocker Matrix Heatmap
-                </CardTitle>
-                <span className="text-[9px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">
-                  Concept Fail Rates
+      {/* ================= STUDENT DIAGNOSTIC DETAIL MODAL ================= */}
+      <Modal
+        isOpen={selectedStudent !== null}
+        onClose={() => setSelectedStudent(null)}
+        title="Student Diagnostic Brief & Action"
+        description="Comprehensive diagnostic metrics and coordinator interventions tools"
+      >
+        {selectedStudent && (
+          <div className="space-y-4 pt-1 text-sm font-sans">
+            
+            {/* 1. Header Student Meta */}
+            <div className="flex items-center justify-between pb-3 border-b border-border">
+              <div>
+                <span className="text-base font-black text-foreground">{selectedStudent.name}</span>
+                <p className="text-xs text-muted-foreground">{selectedStudent.batch} • Regular Registrant</p>
+                <p className="text-[10px] text-muted-foreground font-mono mt-0.5">Parent Phone: {selectedStudent.phone}</p>
+              </div>
+              <div className="text-right">
+                <span className={`text-2xl font-black font-mono block ${
+                  selectedStudent.lastScore < 40 ? 'text-rose-500' : 'text-amber-500'
+                }`}>
+                  {selectedStudent.lastScore}%
+                </span>
+                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider block">
+                  Last Test Score
                 </span>
               </div>
-              <CardDescription className="text-xs">
-                Highest failure frequency tags. <strong className="text-foreground font-semibold">Click a grid cell</strong> to filter active failing candidates.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-5 pt-0 space-y-4">
-              
-              {/* Dynamic Heatmap cells grid */}
-              <div className="grid grid-cols-2 gap-2 mt-1">
-                {initialHeatmapTopics.map((topic, index) => {
-                  const isHighlighted = selectedHeatmapTopic === topic.name;
-                  
-                  // Heatmap color code mappings based on impact
-                  let bgClasses = 'bg-muted text-foreground border-border hover:border-foreground/45';
-                  if (topic.impactLevel === 'Critical') {
-                    bgClasses = isHighlighted 
-                      ? 'bg-destructive/15 text-destructive border-destructive ring-2 ring-destructive ring-offset-2' 
-                      : 'bg-destructive/10 text-destructive border-destructive/20 hover:bg-destructive/20';
-                  } else if (topic.impactLevel === 'High') {
-                    bgClasses = isHighlighted
-                      ? 'bg-amber-500/15 text-amber-600 border-amber-500 ring-2 ring-amber-500 ring-offset-2 dark:text-amber-400'
-                      : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 hover:bg-amber-500/20';
-                  } else if (topic.impactLevel === 'Medium') {
-                    bgClasses = isHighlighted
-                      ? 'bg-primary/15 text-primary border-primary ring-2 ring-primary ring-offset-2'
-                      : 'bg-primary/5 text-primary border-primary/20 hover:bg-primary/10';
-                  }
-
-                  return (
-                    <button
-                      key={index}
-                      type="button"
-                      onClick={() => setSelectedHeatmapTopic(selectedHeatmapTopic === topic.name ? null : topic.name)}
-                      className={`p-3 rounded-lg border text-left transition-all relative cursor-pointer ${bgClasses}`}
-                    >
-                      <div className="flex justify-between items-start">
-                        <span className="text-[9px] font-mono opacity-80 uppercase leading-none">{topic.category}</span>
-                        <span className="text-[9.5px] font-black leading-none bg-background/50 px-1 py-0.5 rounded border border-border/15">
-                          {topic.strugglingCount} Candidates
-                        </span>
-                      </div>
-                      
-                      <p className="mt-2.5 text-[11px] font-black leading-tight truncate">
-                        {topic.name}
-                      </p>
-
-                      <div className="mt-1 flex justify-between items-center text-[8px] font-mono opacity-80">
-                        <span>Severity Index</span>
-                        <span className="font-bold">{topic.impactLevel}</span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Informational guide */}
-              <p className="text-[10px] text-muted-foreground leading-normal flex items-start gap-1.5 pt-1 border-t border-border">
-                <Info className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" />
-                <span>Impact metrics show student ratios with sub-55% accuracy on standard question tag checkpoints.</span>
-              </p>
-
-            </CardContent>
-          </Card>
-
-          {/* ANALYTICS CARD 2: Batch conceptual weakness summaries */}
-          <Card className="border border-border shadow-xs">
-            <CardHeader className="p-5 pb-3">
-              <CardTitle className="text-sm font-black text-foreground flex items-center gap-1.5">
-                <Layers className="h-4 w-4 text-primary shrink-0" />
-                Cohort Blocker Summaries
-              </CardTitle>
-              <CardDescription className="text-xs">
-                Micro-concept accuracy drop points mapped specifically to managed batches.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-5 pt-0 space-y-4 font-sans">
-              
-              {/* Batch 1 Breakdown */}
-              <div className="space-y-2">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-bold text-foreground">CCC Morning Batch A</span>
-                  <span className="text-[10px] font-mono text-muted-foreground">Limit: Cell Referencing</span>
-                </div>
-                {/* Visual score slider bar representation */}
-                <div className="space-y-1">
-                  <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
-                    <div className="h-full rounded-full bg-destructive" style={{ width: '42%' }} />
-                  </div>
-                  <div className="flex justify-between text-[8px] font-mono text-muted-foreground leading-none">
-                    <span>LibreOffice Calc Math Formulas</span>
-                    <span className="text-destructive font-bold">42% Accuracy Mean</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Batch 2 Breakdown */}
-              <div className="space-y-2 pt-1">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-bold text-foreground">DCA Regular Batch B</span>
-                  <span className="text-[10px] font-mono text-muted-foreground">Limit: Access Queries</span>
-                </div>
-                <div className="space-y-1">
-                  <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
-                    <div className="h-full rounded-full bg-destructive" style={{ width: '49%' }} />
-                  </div>
-                  <div className="flex justify-between text-[8px] font-mono text-muted-foreground leading-none">
-                    <span>MS Access Primary Keys & Indexes</span>
-                    <span className="text-destructive font-bold">49% Accuracy Mean</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Batch 3 Breakdown */}
-              <div className="space-y-2 pt-1">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-bold text-foreground">ADCA Evening Advanced</span>
-                  <span className="text-[10px] font-mono text-muted-foreground">Limit: HTML Layout</span>
-                </div>
-                <div className="space-y-1">
-                  <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
-                    <div className="h-full rounded-full bg-amber-500" style={{ width: '58%' }} />
-                  </div>
-                  <div className="flex justify-between text-[8px] font-mono text-muted-foreground leading-none">
-                    <span>HTML div sizing & CSS attributes</span>
-                    <span className="text-amber-600 dark:text-amber-400 font-bold">58% Accuracy Mean</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Batch 4 Breakdown */}
-              <div className="space-y-2 pt-1">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="font-bold text-foreground">Olympiad Excellence Cohort</span>
-                  <span className="text-[10px] font-mono text-muted-foreground">Limit: Permutations Calculus</span>
-                </div>
-                <div className="space-y-1">
-                  <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
-                    <div className="h-full rounded-full bg-emerald-500" style={{ width: '71%' }} />
-                  </div>
-                  <div className="flex justify-between text-[8px] font-mono text-muted-foreground leading-none">
-                    <span>Mathematical induction proofs</span>
-                    <span className="text-emerald-500 font-bold">71% Accuracy Mean</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-2">
-                <button
-                  onClick={() => window.location.hash = '/owner/performance'}
-                  className="w-full py-1.5 border border-dashed border-border hover:border-foreground/35 rounded-lg text-center font-bold text-[10px] text-muted-foreground hover:text-foreground uppercase tracking-widest block"
-                >
-                  Review performance trends
-                </button>
-              </div>
-
-            </CardContent>
-          </Card>
-
-          {/* SYSTEM INTERVENTION RECOMMENDATION FEED */}
-          <Card className="p-4 bg-primary/[0.01] border-dashed border-primary/20">
-            <h4 className="text-xs uppercase font-extrabold text-primary flex items-center gap-1">
-              <Sparkles className="h-4 w-4 shrink-0" />
-              Intelligence Remedial Advisor
-            </h4>
-            <div className="text-[11px] text-muted-foreground mt-2 leading-relaxed space-y-2">
-              <p>
-                Candidates with high homework skip records (e.g. <strong className="text-foreground">Ranbir Kapoor</strong>) showed an immediate <span className="text-foreground font-semibold">+22% score recovery</span> within 10 days of launching remedial modules of sub-12 minutes duration.
-              </p>
-              <p>
-                Suggesting dispatch of WhatsApp warning metrics to Ranbir's registered parent phone <strong className="text-foreground font-mono">+91 98123 45612</strong>.
-              </p>
             </div>
-          </Card>
 
-        </div>
+            {/* 2. Performance Summary Container */}
+            <div className="grid grid-cols-3 gap-2 bg-muted/30 p-2.5 rounded-xl border border-border/40 text-center">
+              <div>
+                <span className="text-xs text-muted-foreground block text-[10px] uppercase font-bold">Avg score</span>
+                <strong className={`text-xs font-mono font-black ${
+                  selectedStudent.avgScore < 40 ? 'text-rose-500' : 'text-amber-500'
+                }`}>
+                  {selectedStudent.avgScore}%
+                </strong>
+              </div>
+              <div>
+                <span className="text-xs text-muted-foreground block text-[10px] uppercase font-bold">Last score</span>
+                <strong className={`text-xs font-mono font-black ${
+                  selectedStudent.lastScore < 40 ? 'text-rose-500' : 'text-amber-500'
+                }`}>
+                  {selectedStudent.lastScore}%
+                </strong>
+              </div>
+              <div>
+                <span className="text-xs text-muted-foreground block text-[10px] uppercase font-bold">Attempted</span>
+                <strong className="text-xs text-foreground font-mono font-black">
+                  {selectedStudent.attemptedTests} tests
+                </strong>
+              </div>
+            </div>
 
-      </div>
-
-      {/* --- REUSABLE MODAL LAYERS --- */}
-
-      {/* MODAL A: ASSIGN REMEDIAL DRILL */}
-      <Modal
-        isOpen={modalType === 'practice' && !!activeModalStudent}
-        onClose={() => { setModalType(null); setActiveModalStudent(null); }}
-        title="Deploy Adaptive Intervention Drill"
-        description={`Custom build and dispatch interactive practice exercises specifically to counter conceptual weaknesses for ${activeModalStudent?.name}.`}
-      >
-        {activeModalStudent && (
-          <form onSubmit={submitAssignPracticeTest} className="space-y-4 pt-2 text-left">
-            
-            <div className="p-3 bg-muted/30 border border-border rounded-xl">
-              <span className="text-[10px] text-muted-foreground block uppercase font-mono">Current Candidate Diagnosis</span>
-              <strong className="text-xs font-bold text-foreground mt-0.5 block">{activeModalStudent.name} ({activeModalStudent.batchName})</strong>
-              <div className="flex flex-wrap gap-1 mt-1.5">
-                {activeModalStudent.weakTopics.map((sub, i) => (
-                  <Badge key={i} variant="outline" className="text-[9px] font-mono bg-background">
-                    {sub}
+            {/* 3. Weak Topics tags list */}
+            <div className="space-y-1.5">
+              <span className="text-xs font-extrabold text-foreground uppercase tracking-wider flex items-center gap-1 select-none">
+                <AlertTriangle className="h-3 w-3 text-amber-500 shrink-0" />
+                Weak Topics
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {selectedStudent.weakTopics.map((topic, i) => (
+                  <Badge key={i} variant="destructive" className="text-[10px] bg-rose-500/10 text-rose-700 font-mono hover:bg-rose-500/20 px-2 py-0 border-transparent">
+                    {topic}
                   </Badge>
                 ))}
               </div>
             </div>
 
+            {/* 4. Notes input / editor section */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-foreground">Target Drill Subject-Unit</label>
-              <Select
-                value={customTestTopic}
-                onChange={(e) => setCustomTestTopic(e.target.value)}
-              >
-                {activeModalStudent.weakTopics.map((topic, idx) => (
-                  <option key={idx} value={topic}>{topic}</option>
-                ))}
-                <option value="MS Excel Pivot Tables & Sorts">MS Excel Pivot Tables & Sorts</option>
-                <option value="Operating System Basics & Files">Operating System Basics & Files</option>
-              </Select>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-foreground">Question Limit Count</label>
-                <Select
-                  value={customTestQuestions}
-                  onChange={(e) => setCustomTestQuestions(e.target.value)}
-                >
-                  <option value="10">10 Questions (Essential)</option>
-                  <option value="15">15 Questions (Standard Practice)</option>
-                  <option value="25">25 Questions (Intensive Review)</option>
-                  <option value="40">40 Questions (Deep Mock)</option>
-                </Select>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-foreground">Time Duration Limit</label>
-                <Select
-                  value={customTestDuration}
-                  onChange={(e) => setCustomTestDuration(e.target.value)}
-                >
-                  <option value="20">20 minutes</option>
-                  <option value="35">35 minutes</option>
-                  <option value="45">45 minutes</option>
-                  <option value="60">60 minutes</option>
-                </Select>
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-foreground">Intervention Mode Setting</label>
-              <div className="p-3 rounded-lg border border-primary/20 bg-primary/[0.01] text-xs text-muted-foreground leading-normal font-medium">
-                ⚡ <strong className="text-primary font-bold">Concept Booster Mode</strong> is active. The engine dynamically sets easier starting steps for the first 4 questions to stabilize the candidate confidence baseline.
-              </div>
-            </div>
-
-            <div className="pt-4 flex justify-end gap-2 border-t border-border">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => { setModalType(null); setActiveModalStudent(null); }}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                className="bg-primary hover:bg-primary/95 font-extrabold text-xs"
-              >
-                Deploy Homework Drill
-              </Button>
-            </div>
-
-          </form>
-        )}
-      </Modal>
-
-      {/* MODAL B: SEND WHATSAPP REPORT */}
-      <Modal
-        isOpen={modalType === 'whatsapp' && !!activeModalStudent}
-        onClose={() => { setModalType(null); setActiveModalStudent(null); }}
-        title="Dispatch WhatsApp Parent Warn Card"
-        description={`Send a direct analytical diagnostic brief to the parent of ${activeModalStudent?.name}.`}
-      >
-        {activeModalStudent && (
-          <div className="space-y-4 pt-2">
-            
-            <div className="p-3 border rounded-xl bg-muted/40 font-mono text-xs text-foreground space-y-2">
-              <span className="text-[10px] text-muted-foreground block uppercase font-black font-sans">Message Preview Log</span>
-              <p className="leading-relaxed whitespace-pre-line text-[11px]">
-                {`Respected Parent,
-This is diagnostic brief info from Result Booster.
-Candidate: ${activeModalStudent.name} (Batch: ${activeModalStudent.batchName})
-Current overall accuracy is at ${activeModalStudent.averageScore}% (Target: 70%).
-
-Conceptual block issues detected in:
-${activeModalStudent.weakTopics.map(t => `• ${t}`).join('\n')}
-
-Pending remedial tasks skipped: ${activeModalStudent.skippedTestsCount} homework papers.
-We have deployed tailored revision units. Please ensure daily adherence at home.
-Regards, Result Booster Admin.`}
-              </p>
-            </div>
-
-            <div className="space-y-2 text-xs text-muted-foreground leading-normal">
-              <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-primary shrink-0" />
-                <span>Parent Mobile Coordinate: <strong className="text-foreground tracking-wider font-mono">{activeModalStudent.mobile}</strong></span>
-              </div>
-              <p>
-                Dispatched metrics will include immediate links for parent authorization sheets and previous year error indices.
-              </p>
-            </div>
-
-            <div className="pt-4 flex justify-end gap-2 border-t border-border">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => { setModalType(null); setActiveModalStudent(null); }}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                onClick={submitWhatsAppReport}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs flex items-center gap-1.5"
-              >
-                <MessageCircle className="h-3.5 w-3.5 shrink-0" />
-                Secure Dispatch Now
-              </Button>
-            </div>
-
-          </div>
-        )}
-      </Modal>
-
-      {/* MODAL C: DETAILED STUDENT DOSSIER VIEW */}
-      <Modal
-        isOpen={modalType === 'view' && !!activeModalStudent}
-        onClose={() => { setModalType(null); setActiveModalStudent(null); }}
-        title="Candidate Diagnostic Brief"
-        description="Comprehensive summary of conceptual struggles and action items."
-      >
-        {activeModalStudent && (
-          <div className="space-y-4 pt-2 text-left">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-black text-foreground">{activeModalStudent.name}</h3>
-                <p className="text-[10px] text-muted-foreground font-mono">{activeModalStudent.email}</p>
-              </div>
-              <div className="text-right">
-                <span className="text-xs font-black text-destructive block">{activeModalStudent.averageScore}% Accuracy</span>
-                <span className="text-[9px] text-muted-foreground block">Roster joined: {activeModalStudent.joinedDate}</span>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-3">
-              <div className="space-y-1">
-                <span className="text-[10px] text-muted-foreground font-bold block uppercase tracking-wider">Specific conceptual blocks</span>
-                <div className="flex flex-wrap gap-1.5">
-                  {activeModalStudent.weakTopics.map((topic, i) => (
-                    <Badge key={i} variant="outline" className="text-[10px] font-mono bg-muted/40">
-                      {topic}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-1 pt-1.5">
-                <span className="text-[10px] text-muted-foreground font-bold block uppercase tracking-wider">Current teacher notes &amp; plans</span>
-                <div className="p-3 bg-muted/20 rounded-lg text-xs italic text-muted-foreground leading-relaxed">
-                  &ldquo;{activeModalStudent.teacherNotes}&rdquo;
-                </div>
-              </div>
-
-              <div className="space-y-1 pt-1.5">
-                <span className="text-[10px] text-muted-foreground font-bold block uppercase tracking-wider">Core Parameters</span>
-                <div className="grid grid-cols-2 gap-3 text-xs">
-                  <div className="p-2 border rounded-lg bg-card">
-                    <span className="text-[9px] text-muted-foreground block uppercase">Missed sessions</span>
-                    <strong className="text-foreground text-sm font-black">{activeModalStudent.skippedTestsCount} tests</strong>
-                  </div>
-                  <div className="p-2 border rounded-lg bg-card">
-                    <span className="text-[9px] text-muted-foreground block uppercase">SMS Notification Contact</span>
-                    <strong className="text-foreground text-xs font-mono block mt-1">{activeModalStudent.mobile}</strong>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-4 flex justify-between gap-2 border-t border-border">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  // Direct jump pathway to edit coordinates in candidates roster
-                  window.location.hash = `/owner/students`;
-                }}
-                className="text-primary hover:text-primary/90 font-bold text-xs"
-              >
-                Go to Candidate Profile
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => { setModalType(null); setActiveModalStudent(null); }}
-              >
-                Close Dossier
-              </Button>
-            </div>
-          </div>
-        )}
-      </Modal>
-
-      {/* MODAL D: EDIT TEACHER NOTES */}
-      <Modal
-        isOpen={modalType === 'edit-note' && !!activeModalStudent}
-        onClose={() => { setModalType(null); setActiveModalStudent(null); }}
-        title="Update Candidate Remedial Remark"
-        description={`Modify central coordination action items and notes for ${activeModalStudent?.name}.`}
-      >
-        {activeModalStudent && (
-          <form onSubmit={saveTeacherNoteChange} className="space-y-4 pt-2 text-left">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-foreground">Teacher / Coordinator Remedial Remark Notes</label>
+              <label className="text-xs font-extrabold text-foreground uppercase tracking-wider flex items-center gap-1">
+                <FileText className="h-3 w-3 text-primary shrink-0" />
+                Coordinator Remarks
+              </label>
               <textarea
-                value={interactiveTeacherNote}
-                onChange={(e) => setInteractiveTeacherNote(e.target.value)}
-                className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed"
-                placeholder="Describe current candidate struggle patterns or parent feedback log..."
-                required
+                rows={2}
+                value={activeNoteText}
+                onChange={(e) => setActiveNoteText(e.target.value)}
+                placeholder="Type dynamic action plan notes regarding missed classes or feedback loops..."
+                className="w-full text-xs p-2.5 border border-border rounded-xl focus:border-primary/50 outline-hidden resize-none bg-background block"
               />
-              <p className="text-[10px] text-muted-foreground">
-                This remark will appear on dynamic exception dashboard blocks for institute directors. Mention recommended hours of 1-1 session if any.
-              </p>
+              <div className="text-right">
+                <button
+                  type="button"
+                  onClick={handleSaveNotes}
+                  className="text-[10px] font-bold text-primary hover:underline uppercase tracking-wide cursor-pointer"
+                >
+                  Save Active Note Update
+                </button>
+              </div>
             </div>
 
-            <div className="pt-4 flex justify-end gap-2 border-t border-border">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => { setModalType(null); setActiveModalStudent(null); }}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                className="bg-primary hover:bg-primary/95 text-xs font-extrabold"
-              >
-                Save Intervention Note
-              </Button>
+            {/* 5. Quick Actions buttons */}
+            <div className="space-y-2 pt-3 border-t border-border">
+              <span className="text-xs font-extrabold text-foreground uppercase tracking-wider block mb-1">
+                Quick Actions
+              </span>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {/* Assign remedial homework mock */}
+                <div className="p-3 border border-border rounded-xl space-y-2 flex flex-col justify-between">
+                  <div>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase block">1. Remedial Assignment</span>
+                    <select
+                      value={testToAssign}
+                      onChange={(e) => setTestToAssign(e.target.value)}
+                      className="w-full text-[11px] bg-background border border-border rounded p-1 mt-1 outline-hidden"
+                    >
+                      <option value="Excel basic formulas drill (15 min)">Excel formulas drill (15 min)</option>
+                      <option value="Internet fundamentals mock (20 min)">Internet fundamentals (20 min)</option>
+                      <option value="Word formatting tools revision (25 min)">Word formatting revision (25 min)</option>
+                      <option value="Variables syntax starter logic (10 min)">Variables logic (10 min)</option>
+                    </select>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAssignTest}
+                    className="w-full mt-2 inline-flex items-center justify-center gap-1 py-1.5 bg-primary text-primary-foreground font-bold text-xs rounded-md transition-all cursor-pointer active:scale-95"
+                  >
+                    <BookOpen className="h-3 w-3" />
+                    <span>Assign Test</span>
+                  </button>
+                </div>
+
+                {/* Send WhatsApp Message */}
+                <div className="p-3 border border-border rounded-xl space-y-2 flex flex-col justify-between">
+                  <div>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase block">2. Parent alert</span>
+                    <p className="text-[10px] text-muted-foreground mt-1 leading-normal italic">
+                      "Dear Parent, {selectedStudent.name} scored only {selectedStudent.lastScore}% on their last mock..."
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleSendWhatsApp}
+                    className="w-full inline-flex items-center justify-center gap-1 py-1.5 bg-emerald-500 text-white font-bold text-xs rounded-md transition-all cursor-pointer hover:bg-emerald-600 active:scale-95"
+                  >
+                    <Phone className="h-3 w-3" />
+                    <span>Send WhatsApp</span>
+                  </button>
+                </div>
+              </div>
+
             </div>
-          </form>
+
+            {/* Footer Modal exit */}
+            <div className="pt-2 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setSelectedStudent(null)}
+                className="px-3 py-1.5 border border-border hover:bg-accent rounded-lg text-xs font-semibold text-muted-foreground cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+
+          </div>
         )}
       </Modal>
 
